@@ -6,7 +6,7 @@ func main() {
 	params = map[string]string{
 		//"from": "RUB",
 		//"to":   "USD",
-	}
+	} // empty equal from/to for RUB, GPB, EUR, USD
 
 	response, err := getCurrencyRates(params)
 
