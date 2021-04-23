@@ -1,6 +1,18 @@
 package main
 
 func main() {
+	updateBankRates()
+}
+
+func updateBankRates() {
+	updateTinkoffRates()
+}
+
+func updateTinkoffRates() {
+	updateMainRatesTinkoff()
+}
+
+func updateMainRatesTinkoff() {
 	var params map[string]string
 
 	params = map[string]string{
