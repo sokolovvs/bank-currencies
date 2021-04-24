@@ -1,10 +1,13 @@
 package main
 
 import (
+	log "github.com/Sirupsen/logrus"
 	"github.com/jasonlvhit/gocron"
 )
 
 func main() {
+	log.SetFormatter(&log.JSONFormatter{})
+
 	gocron.Every(1).Day().At("00:00:00").Do(updateBankRates)
 
 	<-gocron.Start()
@@ -29,7 +32,8 @@ func updateMainRatesTinkoff() {
 	response, err := getCurrencyRates(params)
 
 	if err != nil {
-		panic(err)
+		log.Error(err)
+		return
 	}
 
 	rates := filterRates(response.Payload.Rates, func(rate RateFromResponse) bool {
