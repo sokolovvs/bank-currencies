@@ -1,12 +1,25 @@
 package main
 
 import (
+	"database/sql"
 	"github.com/jasonlvhit/gocron"
+	"github.com/joho/godotenv"
+	_ "github.com/lib/pq"
 	log "github.com/sirupsen/logrus"
+	"os"
 )
 
 func main() {
 	log.SetFormatter(&log.JSONFormatter{})
+	err := godotenv.Load()
+
+	if err != nil {
+		log.WithFields(log.Fields{"err": err}).Fatal("Error loading .env file")
+	}
+
+	dbConnectionStr := os.Getenv("DB_CONNECTION")
+	dbDriver := os.Getenv("DB_DRIVER")
+	sql.Open(dbDriver, dbConnectionStr)
 
 	gocron.Every(1).Day().At("00:00:00").Do(updateBankRates)
 
