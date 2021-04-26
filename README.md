@@ -1,0 +1,1 @@
+### To run the application you should use [dockerize-project](https://github.com/sokolovvs/dockerize-bank-currencies)
