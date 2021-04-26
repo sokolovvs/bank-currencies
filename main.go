@@ -1,12 +1,13 @@
 package main
 
 import (
-	"database/sql"
+	"fmt"
+	"github.com/gorilla/mux"
 	"github.com/jasonlvhit/gocron"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	log "github.com/sirupsen/logrus"
-	"os"
+	"net/http"
 )
 
 func main() {
@@ -17,9 +18,19 @@ func main() {
 		log.WithFields(log.Fields{"err": err}).Fatal("Error loading .env file")
 	}
 
-	dbConnectionStr := os.Getenv("DB_CONNECTION")
-	dbDriver := os.Getenv("DB_DRIVER")
-	sql.Open(dbDriver, dbConnectionStr)
+	r := mux.NewRouter()
+
+	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, "Welcome to this life-changing API.\nIts the best API, its true, all other API's are fake.")
+	})
+
+	//appPort := os.Getenv("APP_PORT")
+
+	err = http.ListenAndServe(":8888", r)
+
+	if err != nil {
+		log.Error(err)
+	}
 
 	gocron.Every(1).Day().At("00:00:00").Do(updateBankRates)
 
