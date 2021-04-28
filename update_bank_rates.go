@@ -1,42 +1,28 @@
 package main
 
-import (
-	log "github.com/sirupsen/logrus"
-)
+import "fmt"
 
 func updateBankRates() {
 	updateTinkoffRates()
 }
 
-func updateTinkoffRates() {
-	updateMainRatesTinkoff()
-}
+func saveBankRates(models []BankRateModel) {
 
-func updateMainRatesTinkoff() {
-	var params map[string]string
+	//db, err := sql.Open(getDatabaseSecrets())
+	//tx, err := db.Begin()
+	//defer tx.Rollback()
+	//defer db.Close()
+	//
+	//if err != nil {
+	//	log.Error(err)
+	//	return
+	//}
 
-	params = map[string]string{
-		//"from": "RUB",
-		//"to":   "USD",
-	} // empty equal from/to for RUB, GPB, EUR, USD
+	for _, model := range models {
+		fmt.Println(model)
+		//tx.Exec("INSERT INTO rates (model, company, price) VALUES ('iPhone X', $1, $2)",
+		//	"Apple", 72000)
+	} /*&& categoryCondition*/
 
-	response, err := getCurrencyRates(params)
-
-	if err != nil {
-		log.Error(err)
-		return
-	}
-
-	rates := filterRates(response.Payload.Rates, func(rate RateFromResponse) bool {
-		fromCondition, _ := inArray(rate.FromCurrency.Name, []string{"RUB", "EUR", "USD"})
-		toCondition, _ := inArray(rate.ToCurrency.Name, []string{"RUB", "EUR", "USD"})
-
-		if fromCondition && toCondition && rate.Category == "DebitCardsOperations" {
-			return true
-		}
-
-		return false
-	})
-
-	response.Payload.Rates = rates
+	//tx.Commit()
 }
