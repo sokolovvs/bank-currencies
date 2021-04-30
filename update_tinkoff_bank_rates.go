@@ -1,29 +1,14 @@
 package main
 
 import (
+	"fmt"
 	log "github.com/sirupsen/logrus"
 )
 
 func updateTinkoffRates() {
-	updateMainRatesTinkoff()
-}
+	log.Info(fmt.Sprintf("cron task %s was called", "updateTinkoffRates()"))
 
-func updateMainRatesTinkoff() {
-	var params map[string]string
-
-	params = map[string]string{
-		"from": "USD",
-		"to":   "RUB",
-	}
-
-	response, err := getCurrencyRates(params)
-
-	if err != nil {
-		log.Error(err)
-		return
-	}
-
-	rates := filterRates(response.Payload.Rates, func(rate RateFromResponse) bool {
+	defaultFilterFunc := func(rate RateFromResponse) bool {
 		categoryCondition, _ := inArray(rate.Category, []string{"C2CTransfers"})
 		notZerosCondition := rate.Buy != 0 && rate.Sell != 0
 
@@ -32,7 +17,24 @@ func updateMainRatesTinkoff() {
 		}
 
 		return false
-	})
+	}
+
+	updateTinkoffRatesByParams(map[string]string{"from": "USD", "to": "RUB"}, defaultFilterFunc)
+	updateTinkoffRatesByParams(map[string]string{"from": "EUR", "to": "RUB"}, defaultFilterFunc)
+	updateTinkoffRatesByParams(map[string]string{"from": "KZT", "to": "RUB"}, defaultFilterFunc)
+	updateTinkoffRatesByParams(map[string]string{"from": "CAD", "to": "RUB"}, defaultFilterFunc)
+	updateTinkoffRatesByParams(map[string]string{"from": "AUD", "to": "RUB"}, defaultFilterFunc)
+}
+
+func updateTinkoffRatesByParams(params map[string]string, filterFunc func(response RateFromResponse) bool) {
+	response, err := getCurrencyRates(params)
+
+	if err != nil {
+		log.Error(err)
+		return
+	}
+
+	rates := filterRates(response.Payload.Rates, filterFunc)
 
 	response.Payload.Rates = rates
 	saveBankRates(convertTinkoffResponseToBankRateModels(response))

@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	log "github.com/sirupsen/logrus"
-	"time"
 )
 
 func saveRate(rate Rate) error {
@@ -22,7 +21,7 @@ func saveRate(rate Rate) error {
 
 		defer stmt.Close()
 
-		result := stmt.QueryRow(rate.BankId, rate.Category, rate.FromCurrencyId, rate.ToCurrencyId, rate.Buy, rate.Sell, time.Unix(int64(rate.CreatedAt), 0).String())
+		result := stmt.QueryRow(rate.BankId, rate.Category, rate.FromCurrencyId, rate.ToCurrencyId, rate.Buy, rate.Sell, getCreatedAtAsTime(rate))
 
 		if err = result.Scan(&rate.Id); err != nil {
 			log.WithFields(log.Fields{"err": err, "rate": rate}).Warn(fmt.Sprintf("Error when inserting rate"))
