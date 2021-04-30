@@ -12,8 +12,8 @@ func updateMainRatesTinkoff() {
 	var params map[string]string
 
 	params = map[string]string{
-		"from": "RUB",
-		"to":   "USD",
+		"from": "USD",
+		"to":   "RUB",
 	}
 
 	response, err := getCurrencyRates(params)
