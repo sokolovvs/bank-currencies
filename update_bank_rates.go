@@ -6,7 +6,7 @@ func updateBankRates() {
 	updateTinkoffRates()
 }
 
-func saveBankRates(models []BankRateModel) {
+func saveBankRates(models []Rate) {
 
 	//db, err := sql.Open(getDatabaseSecrets())
 	//tx, err := db.Begin()

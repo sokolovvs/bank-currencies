@@ -24,12 +24,10 @@ func updateMainRatesTinkoff() {
 	}
 
 	rates := filterRates(response.Payload.Rates, func(rate RateFromResponse) bool {
-		fromCondition, _ := inArray(rate.FromCurrency.Name, []string{"RUB", "EUR", "USD"})
-		toCondition, _ := inArray(rate.ToCurrency.Name, []string{"RUB", "EUR", "USD"})
-		//categoryCondition, _ := inArray(rate.Category, []string{"C2CTransfers"})
+		categoryCondition, _ := inArray(rate.Category, []string{"C2CTransfers"})
 		notZerosCondition := rate.Buy != 0 && rate.Sell != 0
 
-		if fromCondition && toCondition /*&& categoryCondition*/ && notZerosCondition {
+		if notZerosCondition && categoryCondition {
 			return true
 		}
 
@@ -40,15 +38,20 @@ func updateMainRatesTinkoff() {
 	saveBankRates(convertTinkoffResponseToBankRateModels(response))
 }
 
-func convertTinkoffResponseToBankRateModels(resp SuccessResponseFromTinkoffCurrencyRates) []BankRateModel {
-	converted := make([]BankRateModel, len(resp.Payload.Rates))
+func convertTinkoffResponseToBankRateModels(resp SuccessResponseFromTinkoffCurrencyRates) []Rate {
+	converted := make([]Rate, 0)
 
-	for index, v := range resp.Payload.Rates {
-		model := BankRateModel{
-			Category: v.Category, FromCurrencyName: v.FromCurrency.Name, ToCurrencyName: v.ToCurrency.Name,
-			Buy: v.Buy, Sell: v.Sell, LastUpdate: resp.Payload.LastUpdate.Milliseconds,
+	for _, rate := range resp.Payload.Rates {
+		bank, bankIsExist := findBankByAlias("tinkoff")
+		fromCurrency, fromCurrencyIsExist := findCurrencyByAlias(rate.FromCurrency.Name)
+		toCurrency, toCurrencyIsExist := findCurrencyByAlias(rate.ToCurrency.Name)
+
+		if !bankIsExist || !fromCurrencyIsExist || !toCurrencyIsExist {
+			continue
 		}
-		converted[index] = model
+
+		converted = append(converted, createBankRateModel(rate.Category, fromCurrency.Id, toCurrency.Id,
+			resp.Payload.LastUpdate.Milliseconds/1000, bank.Id, rate.Buy, rate.Sell))
 	}
 
 	return converted
