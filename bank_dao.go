@@ -26,3 +26,41 @@ func findBankByAlias(alias string) (bank Bank, isExist bool) {
 	isExist = true
 	return
 }
+
+func findBanks() ([]Bank, error) {
+	banks := make([]Bank, 0)
+
+	stmt, err := db.Prepare("SELECT id, alias FROM banks")
+
+	if err != nil {
+		log.WithFields(log.Fields{"err": err}).Error("Error when trying to prepare statement")
+
+		return banks, err
+	}
+
+	defer stmt.Close()
+
+	rows, err := stmt.Query()
+
+	if err != nil {
+		log.Fatal(err)
+
+		return banks, err
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		bank := Bank{}
+
+		if err := rows.Scan(&bank.Id, &bank.Alias); err != nil {
+			log.Fatal(err)
+
+			return banks, err
+		}
+
+		banks = append(banks, bank)
+	}
+
+	return banks, err
+}

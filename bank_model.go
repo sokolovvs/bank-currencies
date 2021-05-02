@@ -1,6 +1,6 @@
 package main
 
 type Bank struct {
-	Id    int
-	Alias string
+	Id    int    `json:"id"`
+	Alias string `json:"alias"`
 }
