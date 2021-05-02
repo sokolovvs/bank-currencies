@@ -31,3 +31,22 @@ func getBanksAction(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	fmt.Fprintf(w, string(serializedResponse))
 }
+
+func getCurrenciesAction(w http.ResponseWriter, r *http.Request) {
+	banks, err := findCurrencies()
+	serializedResponse, errJson := json.Marshal(banks)
+
+	if err != nil || errJson != nil {
+		w.Header().Set("Content-Type", "application/problem+json")
+		w.WriteHeader(http.StatusInternalServerError)
+
+		serializedResponse, _ = json.Marshal(map[string]string{"message": "Internal server error"})
+		fmt.Fprintf(w, string(serializedResponse))
+
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	fmt.Fprintf(w, string(serializedResponse))
+}
