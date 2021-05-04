@@ -1,0 +1,83 @@
+openapi: 3.0.1
+info:
+  title: Bank currency rates
+  version: 1.0.0
+servers:
+  - url: 'http://locallhost:8888./api/v1'
+    description: 'DEV API v1'
+components:
+  schemas:
+    Bank:
+      required:
+        - id
+        - alias
+      properties:
+        id:
+          type: integer
+        alias:
+          $ref: '#/components/schemas/BankAliasEnum'
+    BankAliasEnum:
+      type: string
+      enum: [ "tinkoff" ]
+    Currency:
+      required:
+        - id
+        - name
+        - alias
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        alias:
+          $ref: '#/components/schemas/CurrencyAliasEnum'
+    CurrencyAliasEnum:
+      type: string
+      enum: [ "RUB", "EUR", "USD", "KZT", "CAD", "AUD" ]
+tags:
+  - name: Banks
+  - name: Currencies
+  - name: Rates
+paths:
+  /banks:
+    get:
+      tags:
+        - Banks
+      responses:
+        200:
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Bank'
+        500:
+          description: Internal server Error
+          content:
+            application/problem+json:
+              schema:
+                properties:
+                  message:
+                    type: string
+  /currencies:
+    get:
+      tags:
+        - Currencies
+      responses:
+        200:
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Currency'
+        500:
+          description: Internal server Error
+          content:
+            application/problem+json:
+              schema:
+                properties:
+                  message:
+                    type: string

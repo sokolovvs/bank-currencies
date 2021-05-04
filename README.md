@@ -5,3 +5,5 @@
 ### .env files to configure:
 
 [bcr](./src/bcr/.env)
+
+## [API DOCS](./openapi.yaml)
