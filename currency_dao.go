@@ -27,3 +27,41 @@ func findCurrencyByAlias(alias string) (currency Currency, isExist bool) {
 	isExist = true
 	return
 }
+
+func findCurrencies() ([]Currency, error) {
+	currencies := make([]Currency, 0)
+
+	stmt, err := db.Prepare("SELECT id, name, alias FROM currencies")
+
+	if err != nil {
+		log.WithFields(log.Fields{"err": err}).Error("Error when trying to prepare statement")
+
+		return currencies, err
+	}
+
+	defer stmt.Close()
+
+	rows, err := stmt.Query()
+
+	if err != nil {
+		log.Fatal(err)
+
+		return currencies, err
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		currency := Currency{}
+
+		if err := rows.Scan(&currency.Id, &currency.Name, &currency.Alias); err != nil {
+			log.Fatal(err)
+
+			return currencies, err
+		}
+
+		currencies = append(currencies, currency)
+	}
+
+	return currencies, err
+}
