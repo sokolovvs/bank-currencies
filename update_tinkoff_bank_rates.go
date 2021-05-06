@@ -28,6 +28,7 @@ func updateTinkoffRates() {
 
 func updateTinkoffRatesByParams(params map[string]string, filterFunc func(response RateFromResponse) bool) {
 	response, err := getCurrencyRates(params)
+	rateDao := new(RateDao)
 
 	if err != nil {
 		log.Error(err)
@@ -37,7 +38,7 @@ func updateTinkoffRatesByParams(params map[string]string, filterFunc func(respon
 	rates := filterRates(response.Payload.Rates, filterFunc)
 
 	response.Payload.Rates = rates
-	saveBankRates(convertTinkoffResponseToBankRateModels(response))
+	rateDao.saveMany(convertTinkoffResponseToBankRateModels(response))
 }
 
 func convertTinkoffResponseToBankRateModels(resp SuccessResponseFromTinkoffCurrencyRates) []Rate {

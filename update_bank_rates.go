@@ -5,7 +5,5 @@ func updateBankRates() {
 }
 
 func saveBankRates(rates []Rate) {
-	for _, rate := range rates {
-		saveRate(rate)
-	}
+
 }

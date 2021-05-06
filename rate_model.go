@@ -20,14 +20,14 @@ func createBankRateModel(category string, fromCurrencyId, toCurrencyId, createdA
 	}
 }
 
-func getConvertedBuyRate(r Rate) float32 {
+func (r *Rate) getConvertedBuyRate() float32 {
 	return float32(r.Buy / 100)
 }
 
-func getConvertedSellRate(r Rate) float32 {
+func (r *Rate) getConvertedSellRate() float32 {
 	return float32(r.Sell / 100)
 }
 
-func getCreatedAtAsTime(r Rate) time.Time {
+func (r *Rate) getCreatedAtAsTime() time.Time {
 	return time.Unix(int64(r.CreatedAt), 0)
 }

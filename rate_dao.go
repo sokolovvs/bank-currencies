@@ -7,7 +7,10 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func saveRate(rate Rate) error {
+type RateDao struct {
+}
+
+func (*RateDao) save(rate *Rate) error {
 	jsonRate, _ := json.Marshal(rate)
 	log.WithFields(log.Fields{"rate": string(jsonRate)}).Debug("Trying to save Rate to database")
 
@@ -21,7 +24,7 @@ func saveRate(rate Rate) error {
 
 		defer stmt.Close()
 
-		result := stmt.QueryRow(rate.BankId, rate.Category, rate.FromCurrencyId, rate.ToCurrencyId, rate.Buy, rate.Sell, getCreatedAtAsTime(rate))
+		result := stmt.QueryRow(rate.BankId, rate.Category, rate.FromCurrencyId, rate.ToCurrencyId, rate.Buy, rate.Sell, rate.getCreatedAtAsTime())
 
 		if err = result.Scan(&rate.Id); err != nil {
 			log.WithFields(log.Fields{"err": err, "rate": rate}).Warn(fmt.Sprintf("Error when inserting rate"))
@@ -30,5 +33,13 @@ func saveRate(rate Rate) error {
 		return err
 	}
 
-	return errors.New("updating the Rate is not supported")
+	return errors.New("updating the Rate is not implemented")
+}
+
+func (*RateDao) saveMany(rates []Rate) {
+	rateDao := new(RateDao)
+
+	for _, rate := range rates {
+		rateDao.save(&rate)
+	}
 }
