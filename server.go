@@ -13,6 +13,9 @@ func registerServer() {
 
 	apiV1 := new(HttpApiV1Controller)
 
+	r.HandleFunc("/health-check", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, "running")
+	})
 	r.HandleFunc("/api/v1/banks", apiV1.GetBanks).Methods("GET")
 	r.HandleFunc("/api/v1/currencies", apiV1.GetCurrencies).Methods("GET")
 
