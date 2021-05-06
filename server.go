@@ -11,9 +11,10 @@ import (
 func registerServer() {
 	r := mux.NewRouter()
 
-	r.HandleFunc("/", helloAction)
-	r.HandleFunc("/api/v1/banks", getBanksAction).Methods("GET")
-	r.HandleFunc("/api/v1/currencies", getCurrenciesAction).Methods("GET")
+	apiV1 := new(HttpApiV1Controller)
+
+	r.HandleFunc("/api/v1/banks", apiV1.GetBanks).Methods("GET")
+	r.HandleFunc("/api/v1/currencies", apiV1.GetCurrencies).Methods("GET")
 
 	appPort := os.Getenv("APP_PORT")
 	err := http.ListenAndServe(fmt.Sprintf(":%s", appPort), r)

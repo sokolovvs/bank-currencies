@@ -6,14 +6,10 @@ import (
 	"net/http"
 )
 
-func helloAction(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	serializedResponse, _ := json.Marshal(map[string]string{"msg": "Welcome to this life-changing API.\nIts the best API, its true, all other API's are fake."})
-	fmt.Fprintf(w, string(serializedResponse))
+type HttpApiV1Controller struct {
 }
 
-func getBanksAction(w http.ResponseWriter, r *http.Request) {
+func (*HttpApiV1Controller) GetBanks(w http.ResponseWriter, r *http.Request) {
 	bankDao := new(BankDao)
 	banks, err := bankDao.FindAll()
 	serializedResponse, errJson := json.Marshal(banks)
@@ -33,7 +29,7 @@ func getBanksAction(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, string(serializedResponse))
 }
 
-func getCurrenciesAction(w http.ResponseWriter, r *http.Request) {
+func (*HttpApiV1Controller) GetCurrencies(w http.ResponseWriter, r *http.Request) {
 	currencyDao := new(CurrencyDao)
 	banks, err := currencyDao.FindAll()
 	serializedResponse, errJson := json.Marshal(banks)
