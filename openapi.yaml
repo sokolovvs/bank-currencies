@@ -3,7 +3,7 @@ info:
   title: Bank currency rates
   version: 1.0.0
 servers:
-  - url: 'http://locallhost:8888./api/v1'
+  - url: 'http://locallhost:8888/api/v1'
     description: 'DEV API v1'
 components:
   schemas:
