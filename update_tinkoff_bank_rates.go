@@ -41,10 +41,11 @@ func updateTinkoffRatesByParams(params map[string]string, filterFunc func(respon
 }
 
 func convertTinkoffResponseToBankRateModels(resp SuccessResponseFromTinkoffCurrencyRates) []Rate {
+	bankDao := new(BankDao)
 	converted := make([]Rate, 0)
 
 	for _, rate := range resp.Payload.Rates {
-		bank, bankIsExist := findBankByAlias("tinkoff")
+		bank, bankIsExist := bankDao.FindByAlias("tinkoff")
 		fromCurrency, fromCurrencyIsExist := findCurrencyByAlias(rate.FromCurrency.Name)
 		toCurrency, toCurrencyIsExist := findCurrencyByAlias(rate.ToCurrency.Name)
 

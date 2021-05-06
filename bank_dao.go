@@ -4,7 +4,10 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func findBankByAlias(alias string) (bank Bank, isExist bool) {
+type BankDao struct {
+}
+
+func (*BankDao) FindByAlias(alias string) (bank Bank, isExist bool) {
 	stmt, err := db.Prepare("SELECT id, alias FROM banks WHERE alias=$1;")
 
 	if err != nil {
@@ -27,7 +30,7 @@ func findBankByAlias(alias string) (bank Bank, isExist bool) {
 	return
 }
 
-func findBanks() ([]Bank, error) {
+func (*BankDao) FindAll() ([]Bank, error) {
 	banks := make([]Bank, 0)
 
 	stmt, err := db.Prepare("SELECT id, alias FROM banks")

@@ -14,7 +14,8 @@ func helloAction(w http.ResponseWriter, r *http.Request) {
 }
 
 func getBanksAction(w http.ResponseWriter, r *http.Request) {
-	banks, err := findBanks()
+	bankDao := new(BankDao)
+	banks, err := bankDao.FindAll()
 	serializedResponse, errJson := json.Marshal(banks)
 
 	if err != nil || errJson != nil {
