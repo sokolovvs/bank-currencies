@@ -5,7 +5,10 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func findCurrencyByAlias(alias string) (currency Currency, isExist bool) {
+type CurrencyDao struct {
+}
+
+func (*CurrencyDao) FindByAlias(alias string) (currency Currency, isExist bool) {
 	stmt, err := db.Prepare("SELECT id, name, alias FROM currencies WHERE alias=$1;")
 
 	if err != nil {
@@ -28,7 +31,7 @@ func findCurrencyByAlias(alias string) (currency Currency, isExist bool) {
 	return
 }
 
-func findCurrencies() ([]Currency, error) {
+func (*CurrencyDao) FindAll() ([]Currency, error) {
 	currencies := make([]Currency, 0)
 
 	stmt, err := db.Prepare("SELECT id, name, alias FROM currencies")

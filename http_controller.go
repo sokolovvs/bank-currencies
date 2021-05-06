@@ -34,7 +34,8 @@ func getBanksAction(w http.ResponseWriter, r *http.Request) {
 }
 
 func getCurrenciesAction(w http.ResponseWriter, r *http.Request) {
-	banks, err := findCurrencies()
+	currencyDao := new(CurrencyDao)
+	banks, err := currencyDao.FindAll()
 	serializedResponse, errJson := json.Marshal(banks)
 
 	if err != nil || errJson != nil {
