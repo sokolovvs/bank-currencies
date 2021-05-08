@@ -1,8 +1,14 @@
-package main
+package database
 
 import (
+	"database/sql"
 	"fmt"
+	log "github.com/sirupsen/logrus"
 	"os"
+)
+
+var (
+	PgDb *sql.DB
 )
 
 /*
@@ -22,4 +28,22 @@ func getConnectionStr() string {
 	host := os.Getenv("DB_HOST")
 
 	return fmt.Sprintf("user=%s password=%s dbname=%s sslmode=%s host=%s", userName, pass, dbName, sslMode, host)
+}
+
+func InitDb() {
+	var err error
+
+	PgDb, err = sql.Open(getDatabaseSecrets())
+
+	if err != nil {
+		log.WithFields(log.Fields{"err": err}).Fatal("Failed to create sql.DB instance")
+		panic(err)
+	}
+
+	if err = PgDb.Ping(); err != nil {
+		log.WithFields(log.Fields{"err": err}).Fatal("Failed ping to database!")
+		panic(err)
+	}
+
+	log.Info("Database ready to accept connections")
 }

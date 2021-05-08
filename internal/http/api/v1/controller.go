@@ -1,8 +1,9 @@
-package main
+package v1
 
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/sokolovvs/bank-currencies/internal/dao/postgres"
 	"net/http"
 )
 
@@ -10,7 +11,7 @@ type HttpApiV1Controller struct {
 }
 
 func (*HttpApiV1Controller) GetBanks(w http.ResponseWriter, r *http.Request) {
-	bankDao := new(BankDao)
+	bankDao := new(postgres.BankDao)
 	banks, err := bankDao.FindAll()
 	serializedResponse, errJson := json.Marshal(banks)
 
@@ -30,7 +31,7 @@ func (*HttpApiV1Controller) GetBanks(w http.ResponseWriter, r *http.Request) {
 }
 
 func (*HttpApiV1Controller) GetCurrencies(w http.ResponseWriter, r *http.Request) {
-	currencyDao := new(CurrencyDao)
+	currencyDao := new(postgres.CurrencyDao)
 	banks, err := currencyDao.FindAll()
 	serializedResponse, errJson := json.Marshal(banks)
 

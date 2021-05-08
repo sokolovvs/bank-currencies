@@ -1,17 +1,18 @@
-package main
+package http
 
 import (
 	"fmt"
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
+	"github.com/sokolovvs/bank-currencies/internal/http/api/v1"
 	"net/http"
 	"os"
 )
 
-func registerServer() {
+func RegisterServer() {
 	r := mux.NewRouter()
 
-	apiV1 := new(HttpApiV1Controller)
+	apiV1 := new(v1.HttpApiV1Controller)
 
 	r.HandleFunc("/health-check", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "running")

@@ -1,14 +1,16 @@
-package main
+package postgres
 
 import (
 	log "github.com/sirupsen/logrus"
+	"github.com/sokolovvs/bank-currencies/internal/models"
+	"github.com/sokolovvs/bank-currencies/pkg/database"
 )
 
 type BankDao struct {
 }
 
-func (*BankDao) FindByAlias(alias string) (bank Bank, isExist bool) {
-	stmt, err := db.Prepare("SELECT id, alias FROM banks WHERE alias=$1;")
+func (*BankDao) FindByAlias(alias string) (bank models.Bank, isExist bool) {
+	stmt, err := database.PgDb.Prepare("SELECT id, alias FROM banks WHERE alias=$1;")
 
 	if err != nil {
 		log.WithFields(log.Fields{"err": err}).Error("Error when trying to prepare statement")
@@ -30,10 +32,10 @@ func (*BankDao) FindByAlias(alias string) (bank Bank, isExist bool) {
 	return
 }
 
-func (*BankDao) FindAll() ([]Bank, error) {
-	banks := make([]Bank, 0)
+func (*BankDao) FindAll() ([]models.Bank, error) {
+	banks := make([]models.Bank, 0)
 
-	stmt, err := db.Prepare("SELECT id, alias FROM banks")
+	stmt, err := database.PgDb.Prepare("SELECT id, alias FROM banks")
 
 	if err != nil {
 		log.WithFields(log.Fields{"err": err}).Error("Error when trying to prepare statement")
@@ -54,7 +56,7 @@ func (*BankDao) FindAll() ([]Bank, error) {
 	defer rows.Close()
 
 	for rows.Next() {
-		bank := Bank{}
+		bank := models.Bank{}
 
 		if err := rows.Scan(&bank.Id, &bank.Alias); err != nil {
 			log.Fatal(err)

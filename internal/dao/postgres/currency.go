@@ -1,15 +1,17 @@
-package main
+package postgres
 
 import (
 	"fmt"
 	log "github.com/sirupsen/logrus"
+	"github.com/sokolovvs/bank-currencies/internal/models"
+	"github.com/sokolovvs/bank-currencies/pkg/database"
 )
 
 type CurrencyDao struct {
 }
 
-func (*CurrencyDao) FindByAlias(alias string) (currency Currency, isExist bool) {
-	stmt, err := db.Prepare("SELECT id, name, alias FROM currencies WHERE alias=$1;")
+func (*CurrencyDao) FindByAlias(alias string) (currency models.Currency, isExist bool) {
+	stmt, err := database.PgDb.Prepare("SELECT id, name, alias FROM currencies WHERE alias=$1;")
 
 	if err != nil {
 		log.WithFields(log.Fields{"err": err}).Error("Error when trying to prepare statement")
@@ -31,10 +33,10 @@ func (*CurrencyDao) FindByAlias(alias string) (currency Currency, isExist bool) 
 	return
 }
 
-func (*CurrencyDao) FindAll() ([]Currency, error) {
-	currencies := make([]Currency, 0)
+func (*CurrencyDao) FindAll() ([]models.Currency, error) {
+	currencies := make([]models.Currency, 0)
 
-	stmt, err := db.Prepare("SELECT id, name, alias FROM currencies")
+	stmt, err := database.PgDb.Prepare("SELECT id, name, alias FROM currencies")
 
 	if err != nil {
 		log.WithFields(log.Fields{"err": err}).Error("Error when trying to prepare statement")
@@ -55,7 +57,7 @@ func (*CurrencyDao) FindAll() ([]Currency, error) {
 	defer rows.Close()
 
 	for rows.Next() {
-		currency := Currency{}
+		currency := models.Currency{}
 
 		if err := rows.Scan(&currency.Id, &currency.Name, &currency.Alias); err != nil {
 			log.Fatal(err)

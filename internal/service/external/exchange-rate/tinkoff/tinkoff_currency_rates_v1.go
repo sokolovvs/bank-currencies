@@ -1,4 +1,4 @@
-package main
+package tinkoff
 
 import (
 	"encoding/json"
@@ -33,7 +33,7 @@ type RateFromResponse struct {
 	Sell float32 `json:"sell"`
 }
 
-func getCurrencyRates(queryParams map[string]string) (SuccessResponseFromTinkoffCurrencyRates, error) {
+func GetCurrencyRates(queryParams map[string]string) (SuccessResponseFromTinkoffCurrencyRates, error) {
 	req, err := http.NewRequest("GET", "https://api.tinkoff.ru/v1/currency_rates", nil)
 
 	parsedResponse := SuccessResponseFromTinkoffCurrencyRates{}
@@ -74,7 +74,7 @@ func getCurrencyRates(queryParams map[string]string) (SuccessResponseFromTinkoff
 	return parsedResponse, nil
 }
 
-func filterRates(rates []RateFromResponse, f func(rate RateFromResponse) bool) []RateFromResponse {
+func FilterRates(rates []RateFromResponse, f func(rate RateFromResponse) bool) []RateFromResponse {
 	filtered := make([]RateFromResponse, 0)
 
 	for _, v := range rates {

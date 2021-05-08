@@ -1,15 +1,18 @@
-package main
+package tinkoff
 
 import (
 	"fmt"
 	log "github.com/sirupsen/logrus"
+	"github.com/sokolovvs/bank-currencies/internal/dao/postgres"
+	"github.com/sokolovvs/bank-currencies/internal/models"
+	"github.com/sokolovvs/bank-currencies/pkg/utils"
 )
 
-func updateTinkoffRates() {
+func UpdateTinkoffRates() {
 	log.Info(fmt.Sprintf("cron task %s was called", "updateTinkoffRates()"))
 
 	defaultFilterFunc := func(rate RateFromResponse) bool {
-		categoryCondition, _ := inArray(rate.Category, []string{"C2CTransfers"})
+		categoryCondition, _ := utils.InArray(rate.Category, []string{"C2CTransfers"})
 		notZerosCondition := rate.Buy != 0 && rate.Sell != 0
 
 		if notZerosCondition && categoryCondition {
@@ -27,36 +30,36 @@ func updateTinkoffRates() {
 }
 
 func updateTinkoffRatesByParams(params map[string]string, filterFunc func(response RateFromResponse) bool) {
-	response, err := getCurrencyRates(params)
-	rateDao := new(RateDao)
+	response, err := GetCurrencyRates(params)
+	rateDao := new(postgres.RateDao)
 
 	if err != nil {
 		log.Error(err)
 		return
 	}
 
-	rates := filterRates(response.Payload.Rates, filterFunc)
+	rates := FilterRates(response.Payload.Rates, filterFunc)
 
 	response.Payload.Rates = rates
-	rateDao.saveMany(convertTinkoffResponseToBankRateModels(response))
+	rateDao.SaveMany(convertTinkoffResponseToBankRateModels(response))
 }
 
-func convertTinkoffResponseToBankRateModels(resp SuccessResponseFromTinkoffCurrencyRates) []Rate {
-	bankDao := new(BankDao)
-	currencyDao := new(CurrencyDao)
-	converted := make([]Rate, 0)
+func convertTinkoffResponseToBankRateModels(resp SuccessResponseFromTinkoffCurrencyRates) []models.Rate {
+	bankDao := new(postgres.BankDao)
+	currencyDao := new(postgres.CurrencyDao)
+	converted := make([]models.Rate, 0)
 
-	for _, rate := range resp.Payload.Rates {
+	for _, r := range resp.Payload.Rates {
 		bank, bankIsExist := bankDao.FindByAlias("tinkoff")
-		fromCurrency, fromCurrencyIsExist := currencyDao.FindByAlias(rate.FromCurrency.Name)
-		toCurrency, toCurrencyIsExist := currencyDao.FindByAlias(rate.ToCurrency.Name)
+		fromCurrency, fromCurrencyIsExist := currencyDao.FindByAlias(r.FromCurrency.Name)
+		toCurrency, toCurrencyIsExist := currencyDao.FindByAlias(r.ToCurrency.Name)
 
 		if !bankIsExist || !fromCurrencyIsExist || !toCurrencyIsExist {
 			continue
 		}
 
-		converted = append(converted, createBankRateModel(rate.Category, fromCurrency.Id, toCurrency.Id,
-			resp.Payload.LastUpdate.Milliseconds/1000, bank.Id, rate.Buy, rate.Sell))
+		converted = append(converted, models.CreateBankRateModel(r.Category, fromCurrency.Id, toCurrency.Id,
+			resp.Payload.LastUpdate.Milliseconds/1000, bank.Id, r.Buy, r.Sell))
 	}
 
 	return converted

@@ -1,4 +1,4 @@
-package main
+package models
 
 import "time"
 
@@ -13,21 +13,21 @@ type Rate struct {
 	CreatedAt      int    `json:"created_at"` // unix timestamp
 }
 
-func createBankRateModel(category string, fromCurrencyId, toCurrencyId, createdAt, bankId int, buy, sell float32) Rate {
+func CreateBankRateModel(category string, fromCurrencyId, toCurrencyId, createdAt, bankId int, buy, sell float32) Rate {
 	return Rate{
 		Category: category, FromCurrencyId: fromCurrencyId, ToCurrencyId: toCurrencyId,
 		Buy: int(buy * 100), Sell: int(sell * 100), CreatedAt: createdAt, BankId: bankId,
 	}
 }
 
-func (r *Rate) getConvertedBuyRate() float32 {
+func (r *Rate) GetConvertedBuyRate() float32 {
 	return float32(r.Buy / 100)
 }
 
-func (r *Rate) getConvertedSellRate() float32 {
+func (r *Rate) GetConvertedSellRate() float32 {
 	return float32(r.Sell / 100)
 }
 
-func (r *Rate) getCreatedAtAsTime() time.Time {
+func (r *Rate) GetCreatedAtAsTime() time.Time {
 	return time.Unix(int64(r.CreatedAt), 0)
 }

@@ -1,8 +1,8 @@
-package main
+package utils
 
 import "reflect"
 
-func inArray(val interface{}, array interface{}) (exists bool, index int) {
+func InArray(val interface{}, array interface{}) (exists bool, index int) {
 	exists = false
 	index = -1
 

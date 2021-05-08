@@ -6,4 +6,4 @@
 
 [bcr](./src/bcr/.env)
 
-## [API DOCS](./openapi.yaml)
+## [API DOCS](docs/api/openapi.yaml)
