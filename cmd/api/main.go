@@ -4,14 +4,12 @@ import (
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	log "github.com/sirupsen/logrus"
-	"github.com/sokolovvs/bank-currencies/internal/cron"
 	"github.com/sokolovvs/bank-currencies/internal/http"
 	"github.com/sokolovvs/bank-currencies/pkg/database"
 )
 
 func main() {
 	bootstrap()
-	go cron.RegisterCronJobs()
 	http.RegisterServer()
 }
 
