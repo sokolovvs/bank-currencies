@@ -6,11 +6,12 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/sokolovvs/bank-currencies/internal/http"
 	"github.com/sokolovvs/bank-currencies/pkg/database"
+	"os"
 )
 
 func main() {
 	bootstrap()
-	http.RegisterServer()
+	http.NewServer(os.Getenv("APP_PORT")).Serve()
 }
 
 func bootstrap() {

@@ -6,24 +6,34 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/sokolovvs/bank-currencies/internal/http/api/v1"
 	"net/http"
-	"os"
 )
 
-func RegisterServer() {
-	r := mux.NewRouter()
+type Server struct {
+	router *mux.Router
+	api    *Api
+	port   string
+}
 
-	apiV1 := new(v1.HttpApiV1Controller)
+func NewServer(appPort string) *Server {
+	return &Server{router: mux.NewRouter(), api: &Api{v1: new(v1.HttpApiV1Controller)}, port: appPort}
+}
 
-	r.HandleFunc("/health-check", func(w http.ResponseWriter, r *http.Request) {
+func (s *Server) Serve() {
+
+	s.router.HandleFunc("/health-check", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "running")
 	})
-	r.HandleFunc("/api/v1/banks", apiV1.GetBanks).Methods("GET")
-	r.HandleFunc("/api/v1/currencies", apiV1.GetCurrencies).Methods("GET")
+	s.router.HandleFunc("/api/v1/banks", s.api.v1.GetBanks).Methods("GET")
+	s.router.HandleFunc("/api/v1/currencies", s.api.v1.GetCurrencies).Methods("GET")
 
-	appPort := os.Getenv("APP_PORT")
-	err := http.ListenAndServe(fmt.Sprintf(":%s", appPort), r)
+	err := http.ListenAndServe(fmt.Sprintf(":%s", s.port), s.router)
 
 	if err != nil {
-		log.Error(err)
+		log.Error("Listen and serve was failed, err: ", err, " port: ", s.port)
+		panic(err)
 	}
+}
+
+type Api struct {
+	v1 *v1.HttpApiV1Controller
 }
