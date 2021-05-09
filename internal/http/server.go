@@ -26,6 +26,11 @@ func (s *Server) Serve() {
 	s.router.HandleFunc("/api/v1/banks", s.api.v1.GetBanks).Methods("GET")
 	s.router.HandleFunc("/api/v1/currencies", s.api.v1.GetCurrencies).Methods("GET")
 
+	s.listen()
+
+}
+
+func (s *Server) listen() {
 	err := http.ListenAndServe(fmt.Sprintf(":%s", s.port), s.router)
 
 	if err != nil {
