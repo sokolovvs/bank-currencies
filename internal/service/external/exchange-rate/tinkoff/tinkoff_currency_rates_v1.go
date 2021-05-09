@@ -2,6 +2,7 @@ package tinkoff
 
 import (
 	"encoding/json"
+	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"net/http"
 )
@@ -34,11 +35,13 @@ type RateFromResponse struct {
 }
 
 func GetCurrencyRates(queryParams map[string]string) (SuccessResponseFromTinkoffCurrencyRates, error) {
+	log.Info("GetCurrencyRates was called with params: ", queryParams)
 	req, err := http.NewRequest("GET", "https://api.tinkoff.ru/v1/currency_rates", nil)
 
 	parsedResponse := SuccessResponseFromTinkoffCurrencyRates{}
 
 	if err != nil {
+		log.Error("Creating new http request error, err: ", err)
 		return parsedResponse, err
 	}
 
@@ -56,18 +59,21 @@ func GetCurrencyRates(queryParams map[string]string) (SuccessResponseFromTinkoff
 	resp, err := httpClient.Do(req)
 
 	if err != nil || resp.StatusCode != 200 {
+		log.Error("Response code is not 200, err: ", err)
 		return parsedResponse, err
 	}
 
 	body, err := ioutil.ReadAll(resp.Body)
 
 	if err != nil {
+		log.Error("Response.Body parsing err: ", err)
 		return parsedResponse, err
 	}
 
 	err = json.Unmarshal(body, &parsedResponse)
 
 	if err != nil {
+		log.Error("Json decoding err: ", err)
 		return parsedResponse, err
 	}
 

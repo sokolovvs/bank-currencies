@@ -42,6 +42,10 @@ func (*RateDao) SaveMany(rates []models.Rate) {
 	rateDao := new(RateDao)
 
 	for _, rate := range rates {
-		rateDao.Save(&rate)
+		err := rateDao.Save(&rate)
+
+		if err != nil {
+			log.Error(rate, " was not saved successfully")
+		}
 	}
 }

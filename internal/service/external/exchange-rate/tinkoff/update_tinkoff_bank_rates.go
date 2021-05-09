@@ -34,7 +34,7 @@ func updateTinkoffRatesByParams(params map[string]string, filterFunc func(respon
 	rateDao := new(postgres.RateDao)
 
 	if err != nil {
-		log.Error(err)
+		log.Error("Fetching currencies was failed: ", err)
 		return
 	}
 
