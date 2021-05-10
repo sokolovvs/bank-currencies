@@ -6,12 +6,16 @@ import (
 	"github.com/sokolovvs/bank-currencies/internal/dao/postgres"
 	"github.com/sokolovvs/bank-currencies/internal/models"
 	"github.com/sokolovvs/bank-currencies/pkg/utils"
+	tinkoffExchangeRate "github.com/sokolovvs/go-tinkoff-exchange-rates-sdk"
 )
 
-func UpdateTinkoffRates() {
+type TinkoffExchangeRateUpdater struct {
+}
+
+func (u *TinkoffExchangeRateUpdater) UpdateTinkoffRates() {
 	log.Info(fmt.Sprintf("cron task %s was called", "updateTinkoffRates()"))
 
-	defaultFilterFunc := func(rate RateFromResponse) bool {
+	defaultFilterFunc := func(rate tinkoffExchangeRate.RateFromResponse) bool {
 		categoryCondition, _ := utils.InArray(rate.Category, []string{"C2CTransfers"})
 		notZerosCondition := rate.Buy != 0 && rate.Sell != 0
 
@@ -22,15 +26,15 @@ func UpdateTinkoffRates() {
 		return false
 	}
 
-	updateTinkoffRatesByParams(map[string]string{"from": "USD", "to": "RUB"}, defaultFilterFunc)
-	updateTinkoffRatesByParams(map[string]string{"from": "EUR", "to": "RUB"}, defaultFilterFunc)
-	updateTinkoffRatesByParams(map[string]string{"from": "KZT", "to": "RUB"}, defaultFilterFunc)
-	updateTinkoffRatesByParams(map[string]string{"from": "CAD", "to": "RUB"}, defaultFilterFunc)
-	updateTinkoffRatesByParams(map[string]string{"from": "AUD", "to": "RUB"}, defaultFilterFunc)
+	u.updateTinkoffRatesByParams(map[string]string{"from": "USD", "to": "RUB"}, defaultFilterFunc)
+	u.updateTinkoffRatesByParams(map[string]string{"from": "EUR", "to": "RUB"}, defaultFilterFunc)
+	u.updateTinkoffRatesByParams(map[string]string{"from": "KZT", "to": "RUB"}, defaultFilterFunc)
+	u.updateTinkoffRatesByParams(map[string]string{"from": "CAD", "to": "RUB"}, defaultFilterFunc)
+	u.updateTinkoffRatesByParams(map[string]string{"from": "AUD", "to": "RUB"}, defaultFilterFunc)
 }
 
-func updateTinkoffRatesByParams(params map[string]string, filterFunc func(response RateFromResponse) bool) {
-	response, err := GetCurrencyRates(params)
+func (u *TinkoffExchangeRateUpdater) updateTinkoffRatesByParams(params map[string]string, filterFunc func(response tinkoffExchangeRate.RateFromResponse) bool) {
+	response, err := tinkoffExchangeRate.FetchCurrencyRates(params)
 	rateDao := new(postgres.RateDao)
 
 	if err != nil {
@@ -38,13 +42,13 @@ func updateTinkoffRatesByParams(params map[string]string, filterFunc func(respon
 		return
 	}
 
-	rates := FilterRates(response.Payload.Rates, filterFunc)
+	rates := tinkoffExchangeRate.FilterRates(response.Payload.Rates, filterFunc)
 
 	response.Payload.Rates = rates
-	rateDao.SaveMany(convertTinkoffResponseToBankRateModels(response))
+	rateDao.SaveMany(u.convertTinkoffResponseToBankRateModels(response))
 }
 
-func convertTinkoffResponseToBankRateModels(resp SuccessResponseFromTinkoffCurrencyRates) []models.Rate {
+func (u *TinkoffExchangeRateUpdater) convertTinkoffResponseToBankRateModels(resp tinkoffExchangeRate.SuccessResponseFromTinkoffCurrencyRates) []models.Rate {
 	bankDao := new(postgres.BankDao)
 	currencyDao := new(postgres.CurrencyDao)
 	converted := make([]models.Rate, 0)
