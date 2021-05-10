@@ -31,6 +31,7 @@ func (u *TinkoffExchangeRateUpdater) UpdateTinkoffRates() {
 	u.updateTinkoffRatesByParams(map[string]string{"from": "KZT", "to": "RUB"}, defaultFilterFunc)
 	u.updateTinkoffRatesByParams(map[string]string{"from": "CAD", "to": "RUB"}, defaultFilterFunc)
 	u.updateTinkoffRatesByParams(map[string]string{"from": "AUD", "to": "RUB"}, defaultFilterFunc)
+	u.updateTinkoffRatesByParams(map[string]string{"from": "CNY", "to": "RUB"}, defaultFilterFunc)
 }
 
 func (u *TinkoffExchangeRateUpdater) updateTinkoffRatesByParams(params map[string]string, filterFunc func(response tinkoffExchangeRate.RateFromResponse) bool) {
