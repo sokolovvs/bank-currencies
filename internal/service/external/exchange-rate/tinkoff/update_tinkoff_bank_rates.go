@@ -26,15 +26,15 @@ func (u *TinkoffExchangeRateUpdater) UpdateTinkoffRates() {
 		return false
 	}
 
-	u.updateTinkoffRatesByParams(map[string]string{"from": "USD", "to": "RUB"}, defaultFilterFunc)
-	u.updateTinkoffRatesByParams(map[string]string{"from": "EUR", "to": "RUB"}, defaultFilterFunc)
-	u.updateTinkoffRatesByParams(map[string]string{"from": "KZT", "to": "RUB"}, defaultFilterFunc)
-	u.updateTinkoffRatesByParams(map[string]string{"from": "CAD", "to": "RUB"}, defaultFilterFunc)
-	u.updateTinkoffRatesByParams(map[string]string{"from": "AUD", "to": "RUB"}, defaultFilterFunc)
-	u.updateTinkoffRatesByParams(map[string]string{"from": "CNY", "to": "RUB"}, defaultFilterFunc)
+	u.updateByParams(map[string]string{"from": "USD", "to": "RUB"}, defaultFilterFunc)
+	u.updateByParams(map[string]string{"from": "EUR", "to": "RUB"}, defaultFilterFunc)
+	u.updateByParams(map[string]string{"from": "KZT", "to": "RUB"}, defaultFilterFunc)
+	u.updateByParams(map[string]string{"from": "CAD", "to": "RUB"}, defaultFilterFunc)
+	u.updateByParams(map[string]string{"from": "AUD", "to": "RUB"}, defaultFilterFunc)
+	u.updateByParams(map[string]string{"from": "CNY", "to": "RUB"}, defaultFilterFunc)
 }
 
-func (u *TinkoffExchangeRateUpdater) updateTinkoffRatesByParams(params map[string]string, filterFunc func(response tinkoffExchangeRate.RateFromResponse) bool) {
+func (u *TinkoffExchangeRateUpdater) updateByParams(params map[string]string, filterFunc func(response tinkoffExchangeRate.RateFromResponse) bool) {
 	response, err := tinkoffExchangeRate.FetchCurrencyRates(params)
 	rateDao := new(postgres.RateDao)
 
@@ -46,10 +46,10 @@ func (u *TinkoffExchangeRateUpdater) updateTinkoffRatesByParams(params map[strin
 	rates := tinkoffExchangeRate.FilterRates(response.Payload.Rates, filterFunc)
 
 	response.Payload.Rates = rates
-	rateDao.SaveMany(u.convertTinkoffResponseToBankRateModels(response))
+	rateDao.SaveMany(u.ratesFromResponse(response))
 }
 
-func (u *TinkoffExchangeRateUpdater) convertTinkoffResponseToBankRateModels(resp tinkoffExchangeRate.SuccessResponseFromTinkoffCurrencyRates) []models.Rate {
+func (u *TinkoffExchangeRateUpdater) ratesFromResponse(resp tinkoffExchangeRate.SuccessResponseFromTinkoffCurrencyRates) []models.Rate {
 	bankDao := new(postgres.BankDao)
 	currencyDao := new(postgres.CurrencyDao)
 	converted := make([]models.Rate, 0)
