@@ -33,7 +33,7 @@ components:
           $ref: '#/components/schemas/CurrencyAliasEnum'
     CurrencyAliasEnum:
       type: string
-      enum: [ "RUB", "EUR", "USD", "KZT", "CAD", "AUD" ]
+      enum: [ "RUB", "EUR", "USD", "KZT", "CAD", "AUD", "CNY" ]
 tags:
   - name: Banks
   - name: Currencies
