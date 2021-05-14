@@ -6,3 +6,5 @@ build-cron:
 		go mod download && CGO_ENABLED=0 GOOS=linux go build -o ./.bin/cron ./cmd/cron/main.go
 run-cron:
 		./.bin/cron
+test-integration:
+		go test -v ./tests/...
