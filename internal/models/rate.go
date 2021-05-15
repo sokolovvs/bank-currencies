@@ -13,10 +13,10 @@ type Rate struct {
 	CreatedAt      int    `json:"created_at"` // unix timestamp
 }
 
-func CreateBankRateModel(category string, fromCurrencyId, toCurrencyId, createdAt, bankId int, buy, sell float32) Rate {
+func CreateBankRateModel(category string, fromCurrencyId, toCurrencyId, createdAt, bankId, buy, sell int) Rate {
 	return Rate{
 		Category: category, FromCurrencyId: fromCurrencyId, ToCurrencyId: toCurrencyId,
-		Buy: int(buy * 100), Sell: int(sell * 100), CreatedAt: createdAt, BankId: bankId,
+		Buy: buy, Sell: sell, CreatedAt: createdAt, BankId: bankId,
 	}
 }
 

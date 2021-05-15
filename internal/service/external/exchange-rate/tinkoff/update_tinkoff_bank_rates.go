@@ -64,7 +64,7 @@ func (u *TinkoffExchangeRateUpdater) ratesFromResponse(resp tinkoffExchangeRate.
 		}
 
 		converted = append(converted, models.CreateBankRateModel(r.Category, fromCurrency.Id, toCurrency.Id,
-			resp.Payload.LastUpdate.Milliseconds/1000, bank.Id, r.Buy, r.Sell))
+			resp.Payload.LastUpdate.Milliseconds/1000, bank.Id, int(r.Buy*100), int(r.Sell*100)))
 	}
 
 	return converted
