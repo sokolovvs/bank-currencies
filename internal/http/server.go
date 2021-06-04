@@ -25,6 +25,7 @@ func (s *Server) Serve() {
 	})
 	s.router.HandleFunc("/api/v1/banks", s.api.v1.GetBanks).Methods("GET")
 	s.router.HandleFunc("/api/v1/currencies", s.api.v1.GetCurrencies).Methods("GET")
+	s.router.HandleFunc("/api/v1/rates", s.api.v1.GetRates).Methods("GET")
 
 	s.listen()
 

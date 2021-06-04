@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/huandu/go-sqlbuilder"
 	log "github.com/sirupsen/logrus"
 	"github.com/sokolovvs/bank-currencies/internal/models"
 	"github.com/sokolovvs/bank-currencies/pkg/database"
@@ -48,4 +49,42 @@ func (*RateDao) SaveMany(rates []models.Rate) {
 			log.Error(rate, " was not saved successfully")
 		}
 	}
+}
+
+type DtoFindRates struct {
+}
+
+func (*RateDao) FindByParams(dto DtoFindRates) ([]models.Rate, error) {
+	rates := make([]models.Rate, 0)
+
+	sb := sqlbuilder.NewSelectBuilder()
+
+	sb.Select("id", "bank_id", "category", "from_currency_id", "to_currency_id", "buy", "sell", sb.As("CAST(EXTRACT(EPOCH FROM created_at) AS INTEGER)", "createdAtUTS"))
+	sb.From("rates")
+
+	sql, args := sb.Build()
+
+	rows, err := database.PgDb.Query(sql, args...)
+
+	if err != nil {
+		log.Fatal(err)
+
+		return rates, err
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		rate := models.Rate{}
+
+		if err := rows.Scan(&rate.Id, &rate.BankId, &rate.Category, &rate.FromCurrencyId, &rate.ToCurrencyId, &rate.Buy, &rate.Sell, &rate.CreatedAt); err != nil {
+			log.Fatal(err)
+
+			return rates, err
+		}
+
+		rates = append(rates, rate)
+	}
+
+	return rates, err
 }
