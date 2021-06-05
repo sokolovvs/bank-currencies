@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/sokolovvs/bank-currencies/internal/dao/postgres"
+	"github.com/sokolovvs/bank-currencies/internal/models"
 	"net/http"
 )
 
@@ -52,8 +53,14 @@ func (*HttpApiV1Controller) GetCurrencies(w http.ResponseWriter, r *http.Request
 
 func (*HttpApiV1Controller) GetRates(w http.ResponseWriter, r *http.Request) {
 	rateDao := new(postgres.RateDao)
-	rates, err := rateDao.FindByParams(postgres.DtoFindRates{})
-	serializedResponse, errJson := json.Marshal(rates)
+	rates, qty, err := rateDao.FindByParams(postgres.DtoFindRates{Limit: 10})
+	serializedResponse, errJson := json.Marshal(struct {
+		Qty   int           `json:"qty"`
+		Rates []models.Rate `json:"rates"`
+	}{
+		Qty:   qty,
+		Rates: rates,
+	})
 
 	if err != nil || errJson != nil {
 		w.Header().Set("Content-Type", "application/problem+json")

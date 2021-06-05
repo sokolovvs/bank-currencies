@@ -52,9 +52,10 @@ func (*RateDao) SaveMany(rates []models.Rate) {
 }
 
 type DtoFindRates struct {
+	Limit int
 }
 
-func (*RateDao) FindByParams(dto DtoFindRates) ([]models.Rate, error) {
+func (*RateDao) FindByParams(dto DtoFindRates) ([]models.Rate, int, error) {
 	rates := make([]models.Rate, 0)
 
 	sb := sqlbuilder.NewSelectBuilder()
@@ -63,13 +64,12 @@ func (*RateDao) FindByParams(dto DtoFindRates) ([]models.Rate, error) {
 	sb.From("rates")
 
 	sql, args := sb.Build()
-
 	rows, err := database.PgDb.Query(sql, args...)
 
 	if err != nil {
 		log.Fatal(err)
 
-		return rates, err
+		return rates, 0, err
 	}
 
 	defer rows.Close()
@@ -80,11 +80,22 @@ func (*RateDao) FindByParams(dto DtoFindRates) ([]models.Rate, error) {
 		if err := rows.Scan(&rate.Id, &rate.BankId, &rate.Category, &rate.FromCurrencyId, &rate.ToCurrencyId, &rate.Buy, &rate.Sell, &rate.CreatedAt); err != nil {
 			log.Fatal(err)
 
-			return rates, err
+			return rates, 0, err
 		}
 
 		rates = append(rates, rate)
 	}
 
-	return rates, err
+	sb.Select(sb.As("COUNT(id)", "qty"))
+	sqlCount, _ := sb.Build()
+	var qty = 0
+	result := database.PgDb.QueryRow(sqlCount)
+
+	if err := result.Scan(&qty); err != nil {
+		log.Fatal(err)
+
+		return rates, qty, err
+	}
+
+	return rates, qty, err
 }
