@@ -52,10 +52,17 @@ func (*RateDao) SaveMany(rates []models.Rate) {
 }
 
 type DtoFindRates struct {
-	Limit int
+	// pagination
+	Limit        int64 `schema:"limit"`
+	MinCreatedAt int64 `schema:"min_created_at"`
+	MaxCreatedAt int64 `schema:"max_created_at"`
+	//filters
+	FromCurrencyIds []int64 `schema:"from_currency_ids[]"`
+	ToCurrencyIds   []int64 `schema:"to_currency_ids[]"`
+	BankIds         []int64 `schema:"bank_ids[]"`
 }
 
-func (*RateDao) FindByParams(dto DtoFindRates) ([]models.Rate, int, error) {
+func (*RateDao) FindByParams(dto *DtoFindRates) ([]models.Rate, int, error) {
 	rates := make([]models.Rate, 0)
 
 	sb := sqlbuilder.NewSelectBuilder()

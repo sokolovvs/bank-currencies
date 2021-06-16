@@ -3,6 +3,7 @@ package v1
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/gorilla/schema"
 	"github.com/sokolovvs/bank-currencies/internal/dao/postgres"
 	"github.com/sokolovvs/bank-currencies/internal/models"
 	"net/http"
@@ -52,8 +53,30 @@ func (*HttpApiV1Controller) GetCurrencies(w http.ResponseWriter, r *http.Request
 }
 
 func (*HttpApiV1Controller) GetRates(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		w.Header().Set("Content-Type", "application/problem+json")
+		w.WriteHeader(http.StatusBadRequest)
+
+		serializedResponse, _ := json.Marshal(map[string]string{"message": "Bad request"})
+		fmt.Fprintf(w, string(serializedResponse))
+
+		return
+	}
+
+	dto := &postgres.DtoFindRates{}
+
+	if err := schema.NewDecoder().Decode(dto, r.Form); err != nil {
+		w.Header().Set("Content-Type", "application/problem+json")
+		w.WriteHeader(http.StatusBadRequest)
+
+		serializedResponse, _ := json.Marshal(map[string]string{"message": "Bad request"})
+		fmt.Fprintf(w, string(serializedResponse))
+
+		return
+	}
+
 	rateDao := new(postgres.RateDao)
-	rates, qty, err := rateDao.FindByParams(postgres.DtoFindRates{Limit: 10})
+	rates, qty, err := rateDao.FindByParams(dto)
 	serializedResponse, errJson := json.Marshal(struct {
 		Qty   int           `json:"qty"`
 		Rates []models.Rate `json:"rates"`
