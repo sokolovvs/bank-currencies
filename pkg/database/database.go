@@ -26,8 +26,9 @@ func getConnectionStr() string {
 	dbName := os.Getenv("DB_NAME")
 	sslMode := os.Getenv("DB_SSL_MODE")
 	host := os.Getenv("DB_HOST")
+	port := os.Getenv("DB_PORT")
 
-	return fmt.Sprintf("user=%s password=%s dbname=%s sslmode=%s host=%s", userName, pass, dbName, sslMode, host)
+	return fmt.Sprintf("user=%s password=%s dbname=%s sslmode=%s host=%s port=%s", userName, pass, dbName, sslMode, host, port)
 }
 
 func InitDb() {
